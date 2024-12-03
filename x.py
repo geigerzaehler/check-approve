@@ -12,6 +12,8 @@ response = requests.get(
 )
 response.raise_for_status()
 id_token = response.json()["value"]
+assert isinstance(id_token, str)
+print(id_token)
 
 r = requests.post(
     "https://check-approve.axiom.fm/api/check-run",
