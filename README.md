@@ -51,7 +51,13 @@ on a check [does not trigger a workflow run][workflow trigger limitation].
 
 3. Run the workflow containing the action. It creates a failed check with the
    title “Approval required”.
-4. Approve the check through the GitHub UI.
+
+   ![image](https://github.com/user-attachments/assets/8b3b97e7-f1a8-44b8-bcb7-532dbc851c1c)
+
+5. Approve the check through the GitHub UI.
+
+   ![image](https://github.com/user-attachments/assets/d0847f5a-6018-496d-a194-f30f162a6dae)
+
 
 [Install the app]: https://github.com/apps/check-approve
 [Github REST API docs]: https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run--parameters
