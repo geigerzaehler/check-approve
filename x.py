@@ -24,3 +24,5 @@ r = requests.post(
         "output": {"title": "TITLE", "summary": ""},
     },
 )
+print(r.content)
+r.raise_for_status()
