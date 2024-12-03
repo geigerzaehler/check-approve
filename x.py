@@ -17,7 +17,7 @@ print(id_token)
 
 r = requests.post(
     "https://check-approve.axiom.fm/api/check-run",
-    headers={"authorization": f"Bearer ${id_token}"},
+    headers={"authorization": f"Bearer {id_token}"},
     json={
         "name": "screenshot-comparison",
         "head_sha": os.environ["GITHUB_HEAD_SHA"],
