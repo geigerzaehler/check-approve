@@ -17,6 +17,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"@octokit/webhooks-methods": "^5.1.0",
 		"knip": "^5.39.1",
 		"nock": "14.0.0-beta.17",
 		"tsx": "^4.19.2",
