@@ -5,10 +5,12 @@ on:
 jobs:
   require_review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
+      - uses: actions/checkout@v4
       - run: |
-          pipx --version
-          pipx run hatch run ./x.py
           pipx run ./x.py
         env:
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
