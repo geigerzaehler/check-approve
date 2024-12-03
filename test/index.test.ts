@@ -49,7 +49,7 @@ test("create check run success", async () => {
 		{
 			method: "POST",
 			headers: {
-				Authorization: `Bearer ${jwt}`,
+				Authorization: `bearer ${jwt}`,
 			},
 			body: JSON.stringify({
 				name: "foo",
