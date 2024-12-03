@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run:
-          pipx run x.py
+          pipx run ./x.py
         env:
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
