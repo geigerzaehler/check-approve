@@ -17,7 +17,10 @@ export function createListener({
 	let Octokit: typeof octokit.Octokit = octokit.Octokit;
 
 	if (process.env.NODE_ENV === "test") {
-		Octokit = octokit.Octokit.defaults({ throttle: { enabled: false } });
+		Octokit = octokit.Octokit.defaults({
+			throttle: { enabled: false },
+			retry: { enabled: false },
+		});
 	}
 
 	const app = new octokit.App({
@@ -33,18 +36,21 @@ export function createListener({
 		if (!event.payload.installation) {
 			throw new Error("No installation provided with webhoook");
 		}
-
 		const client = await app.getInstallationOctokit(
 			event.payload.installation.id,
 		);
 
-		client.request("PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}", {
-			owner: event.payload.repository.owner.login,
-			repo: event.payload.repository.name,
-			check_run_id: event.payload.check_run.id,
-			status: "completed",
-			conclusion: "success",
-		});
+		await client.request(
+			"PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}",
+			{
+				owner: event.payload.repository.owner.login,
+				repo: event.payload.repository.name,
+				check_run_id: event.payload.check_run.id,
+				status: "completed",
+				conclusion: "success",
+			},
+		);
+		console.log("END");
 	});
 
 	const handleWebhooks = createNodeMiddleware(app.webhooks);
