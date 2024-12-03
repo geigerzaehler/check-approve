@@ -6,8 +6,9 @@ jobs:
   require_review:
     runs-on: ubuntu-latest
     steps:
-      - run:
+      - run: |
           pipx --version
+          pipx run hatch run ./x.py
           pipx run ./x.py
         env:
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
