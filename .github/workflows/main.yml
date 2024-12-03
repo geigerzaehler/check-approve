@@ -1,0 +1,20 @@
+name: main
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      push_image: true
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deploy.yml
+    with:
+      container_image: ${{ needs.build.outputs.container_image }}

@@ -1,0 +1,60 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      push_image:
+        description: "Push the image to the registry"
+        default: false
+        type: boolean
+    outputs:
+      container_image:
+        description: "Name of the container image that was built"
+        value: ${{ jobs.build.outputs.image_name }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      image_name: ${{ steps.image_name.outputs.image_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: npx biome ci
+      - run: npx tsc
+      - run: npx knip
+      - run: pnpm run test
+
+      - uses: google-github-actions/auth@v2
+        with:
+          project_id: "geigerzaehler-dev"
+          workload_identity_provider: projects/958802966192/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+
+      - id: image_name
+        run: |
+          image_repo="europe-west1-docker.pkg.dev/geigerzaehler-dev/check-approve/check-approve"
+          image_tag="$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
+          image_name="${image_repo}:${image_tag}"
+          echo "image_name=$image_name" >> "$GITHUB_OUTPUT"
+      - run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+      - run: |
+          pnpm prepack
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ inputs.push_image }}
+          tags: ${{ steps.image_name.outputs.image_name }}
+          cache-from: type=gha
+          cache-to: type=gha

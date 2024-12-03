@@ -1,0 +1,8 @@
+services:
+  web:
+    image: europe-west1-docker.pkg.dev/geigerzaehler-dev/check-approve/check-approve
+    build: .
+    environment:
+      PRIVATE_KEY_PATH: /w/app-key.pem
+    volumes:
+      - ./:/w:ro

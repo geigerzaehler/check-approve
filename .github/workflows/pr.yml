@@ -1,0 +1,42 @@
+name: pr
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  require_review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const response = await fetch("https://check-approve.axiom.fm/api/check-run", {
+              method: "POST",
+              body: JSON.stringify({
+                name: "approval",
+                head_sha: process.env.GITHUB_HEAD_SHA,
+                status: "completed",
+                conclusion: "failure",
+                details_url: "https://axiom.fm",
+                output: {
+                  title: "Approval required",
+                  summary: "This check requires approval",
+                }
+              }),
+              headers: {
+                authorization: `Bearer ${await core.getIDToken("geigerzaehler/check-approve")}`,
+              },
+            });
+            if (!response.ok) {
+              console.error(`Failed request ${response.status}`)
+              console.error(await response.json())
+              process.exit(1)
+            }
+        env:
+          GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}

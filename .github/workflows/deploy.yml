@@ -1,0 +1,33 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      container_image:
+        required: true
+        type: string
+        description: Name of the container image to be deployed
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    steps:
+      - run: |
+          if [[ "$GITHUB_REF_NAME" != "main" ]]; then
+            echo "::error::Error: Cannot deploy '$GITHUB_REF_NAME'"
+            exit 1
+          fi
+      - uses: google-github-actions/auth@v2
+        with:
+          project_id: geigerzaehler-dev
+          workload_identity_provider: projects/958802966192/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+      - run: |
+          gcloud artifacts docker tags add \
+            "${{ inputs.container_image }}" \
+            "europe-west1-docker.pkg.dev/geigerzaehler-dev/check-approve/check-approve:latest"
+      - run: |
+          gcloud run deploy \
+            --region europe-west1 \
+            check-approve \
+            --image "${{ inputs.container_image }}"

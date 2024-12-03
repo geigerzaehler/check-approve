@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"rootDir": "./",
+		"outDir": "./dist",
+		"checkJs": true,
+		"target": "ES2022",
+		"lib": ["ES2023"],
+		"esModuleInterop": true,
+		"module": "NodeNext",
+		"moduleResolution": "nodenext",
+		"strict": true,
+		"sourceMap": true,
+		"strictNullChecks": true,
+		"noEmit": true
+	}
+}

@@ -1,0 +1,56 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: check-approve
+  labels:
+    cloud.googleapis.com/location: europe-west1
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '1'
+    spec:
+      serviceAccountName: ${RUN_SERVICE_ACCOUNT_EMAIL}
+      timeoutSeconds: 300
+      containerConcurrency: 1
+      containers:
+      - image: europe-west1-docker.pkg.dev/geigerzaehler-dev/check-approve/check-approve
+        env:
+        - name: APP_ID
+          value: '898950'
+        - name: PRIVATE_KEY_PATH
+          value: /mnt/secrets/app-private-key
+        - name: WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${WEBHOOK_SECRET_NAME}
+        ports:
+        - containerPort: 8080
+          name: http1
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 240
+        volumeMounts:
+        - mountPath: /mnt/secrets
+          name: secrets
+      volumes:
+      - name: secrets
+        secret:
+          items:
+          - key: latest
+            path: app-private-key
+          secretName: ${APP_KEY_SECRET_NAME}
+  traffic:
+  - latestRevision: true
+    percent: 100
