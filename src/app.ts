@@ -129,7 +129,7 @@ async function githubJwtAuthenticate(
 		new URL("https://token.actions.githubusercontent.com/.well-known/jwks"),
 	);
 
-	const match = req.headers.authorization?.match(/^Bearer (\S+)$/);
+	const match = req.headers.authorization?.match(/^Bearer (\S+)$/i);
 	if (!match) {
 		throw httpExt.HttpError.json(403, {
 			message: "Invalid authorization header",
